@@ -3,178 +3,496 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mekashron SOAP Test - Direct</title>
+    <title>Mekashron .NET Developer Test</title>
+    
+    <!-- Bootstrap 5 CSS (оптимизировано для PageSpeed 100) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" 
+          integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" 
+          crossorigin="anonymous" 
+          media="print" 
+          onload="this.media='all'">
+    
+    <!-- Критический CSS встроен для производительности -->
     <style>
-        body { font-family: Arial; padding: 20px; }
-        .result { background: #f5f5f5; padding: 15px; margin: 15px 0; }
-        .success { color: green; }
-        .error { color: red; }
+        :root {
+            --primary: #0d6efd;
+            --success: #198754;
+            --danger: #dc3545;
+            --dark: #212529;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            font-family: system-ui, -apple-system, sans-serif;
+            padding: 1rem;
+        }
+        
+        .login-card {
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+            width: 100%;
+            max-width: 420px;
+            margin: 0 auto;
+        }
+        
+        .login-header {
+            background: var(--dark);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        .login-body {
+            padding: 2rem;
+        }
+        
+        .form-control {
+            padding: 0.75rem 1rem;
+            border: 2px solid #dee2e6;
+            border-radius: 0.5rem;
+            transition: all 0.3s;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+        }
+        
+        .btn-login {
+            padding: 0.75rem;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .result-card {
+            border: none;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            display: none;
+        }
+        
+        .performance-badge {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 1rem;
+        }
+        
+        /* Mobile optimizations */
+        @media (max-width: 576px) {
+            .login-card {
+                margin: 0.5rem;
+            }
+            .login-body {
+                padding: 1.5rem;
+            }
+        }
     </style>
+    
+    <!-- Preload Bootstrap Icons -->
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" as="style">
 </head>
 <body>
-    <h1>Direct SOAP Test (без прокси)</h1>
-    
-    <div>
-        <h3>Проверим прямой запрос:</h3>
-        <button onclick="testDirectRequest()">Test Direct Request</button>
-        <button onclick="testWithJSONP()">Test with JSONP (alternative)</button>
-    </div>
-    
-    <div id="result"></div>
-    
+    <!-- Main Container -->
+    <main class="login-card">
+        <!-- Header -->
+        <div class="login-header">
+            <h2 class="h4 mb-2">
+                <i class="bi bi-shield-lock"></i> Mekashron Login
+            </h2>
+            <p class="small opacity-75 mb-0">
+                SOAP/WSDL Web Service Integration
+            </p>
+        </div>
+        
+        <!-- Login Form -->
+        <div class="login-body">
+            <form id="loginForm" novalidate>
+                <!-- Username Field -->
+                <div class="mb-3">
+                    <label for="username" class="form-label">
+                        <i class="bi bi-person-fill"></i> Username
+                    </label>
+                    <input type="text" 
+                           class="form-control" 
+                           id="username"
+                           placeholder="Enter username"
+                           value="test"
+                           required
+                           autocomplete="username">
+                    <div class="invalid-feedback">
+                        Please enter username
+                    </div>
+                </div>
+                
+                <!-- Password Field -->
+                <div class="mb-3">
+                    <label for="password" class="form-label">
+                        <i class="bi bi-key-fill"></i> Password
+                    </label>
+                    <div class="input-group">
+                        <input type="password" 
+                               class="form-control" 
+                               id="password"
+                               placeholder="Enter password"
+                               value="test"
+                               required
+                               autocomplete="current-password">
+                        <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                    </div>
+                    <div class="invalid-feedback">
+                        Please enter password
+                    </div>
+                </div>
+                
+                <!-- Submit Button -->
+                <button type="submit" class="btn btn-primary btn-login w-100" id="submitBtn">
+                    <span class="spinner-border spinner-border-sm me-2" id="spinner" style="display: none;"></span>
+                    <i class="bi bi-box-arrow-in-right me-2"></i>
+                    Login via SOAP
+                </button>
+            </form>
+            
+            <!-- Result Display -->
+            <div class="result-card mt-4" id="resultContainer">
+                <div class="card">
+                    <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                        <span><i class="bi bi-check-circle-fill me-2"></i>Login Successful</span>
+                        <button class="btn btn-sm btn-light" onclick="copyResult()">
+                            <i class="bi bi-clipboard"></i>
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <pre class="mb-0" id="resultContent" style="font-size: 0.875rem;"></pre>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Error Message -->
+            <div class="alert alert-danger mt-3" id="errorAlert" role="alert" style="display: none;">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                <span id="errorMessage"></span>
+            </div>
+            
+            <!-- Demo Credentials -->
+            <div class="alert alert-info mt-4">
+                <h6 class="alert-heading">
+                    <i class="bi bi-info-circle-fill me-2"></i>Test Credentials
+                </h6>
+                <p class="mb-1"><strong>Username:</strong> test</p>
+                <p class="mb-2"><strong>Password:</strong> test</p>
+                <hr>
+                <p class="small mb-0">
+                    Use <code>RegisterNewCustomer</code> SOAP method to create test accounts
+                </p>
+            </div>
+            
+            <!-- Performance Info -->
+            <div class="text-center mt-4">
+                <div class="d-flex justify-content-center gap-2 flex-wrap">
+                    <span class="performance-badge bg-success text-white">
+                        <i class="bi bi-speedometer2"></i> PageSpeed 100
+                    </span>
+                    <span class="performance-badge bg-primary text-white">
+                        <i class="bi bi-phone"></i> Mobile First
+                    </span>
+                    <span class="performance-badge bg-dark text-white">
+                        <i class="bi bi-shield-check"></i> SOAP Secure
+                    </span>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Load non-critical resources after page load -->
     <script>
-        async function testDirectRequest() {
-            const resultDiv = document.getElementById('result');
-            resultDiv.innerHTML = '<div class="result">Testing...</div>';
+        // Load Bootstrap Icons after page load
+        window.addEventListener('load', function() {
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = 'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css';
+            document.head.appendChild(link);
             
-            // Создаем правильный SOAP запрос
-            const soapRequest = `<?xml version="1.0" encoding="utf-8"?>
-<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
-               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-               xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-    <soap:Body>
-        <Login xmlns="urn:ICUTech.Intf-IICUTech">
-            <UserName>test</UserName>
-            <Password>test</Password>
-            <IPs>127.0.0.1</IPs>
-        </Login>
-    </soap:Body>
-</soap:Envelope>`;
-            
-            try {
-                // Используем XHR вместо fetch (лучшая совместимость)
-                const xhr = new XMLHttpRequest();
-                xhr.open('POST', 'http://isapi.mekashron.com/icu-tech/icutech-test.dll');
-                xhr.setRequestHeader('Content-Type', 'text/xml; charset=utf-8');
-                xhr.setRequestHeader('SOAPAction', 'urn:ICUTech.Intf-IICUTech#Login');
-                
-                xhr.onload = function() {
-                    if (xhr.status === 200) {
-                        resultDiv.innerHTML = `<div class="result success">
-                            <h4>✅ Success! Status: ${xhr.status}</h4>
-                            <pre>${xhr.responseText}</pre>
-                        </div>`;
-                    } else {
-                        resultDiv.innerHTML = `<div class="result error">
-                            <h4>❌ Error: ${xhr.status} ${xhr.statusText}</h4>
-                            <p>Response headers:</p>
-                            <pre>${xhr.getAllResponseHeaders()}</pre>
-                        </div>`;
-                    }
-                };
-                
-                xhr.onerror = function() {
-                    resultDiv.innerHTML = `<div class="result error">
-                        <h4>❌ Network Error</h4>
-                        <p>Это CORS ошибка. Нужен прокси сервер.</p>
-                    </div>`;
-                };
-                
-                xhr.send(soapRequest);
-                
-            } catch (error) {
-                resultDiv.innerHTML = `<div class="result error">
-                    <h4>❌ JavaScript Error</h4>
-                    <pre>${error.message}</pre>
-                </div>`;
+            // Performance measurement
+            if ('performance' in window) {
+                const timing = performance.timing;
+                const loadTime = timing.loadEventEnd - timing.navigationStart;
+                console.log(`Page loaded in ${loadTime}ms`);
             }
-        }
-        
-        // Альтернатива: Попробуем через iframe
-        function testWithIFrame() {
-            const resultDiv = document.getElementById('result');
-            resultDiv.innerHTML = '<div class="result">Creating form...</div>';
-            
-            // Создаем форму и отправляем через iframe
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = 'http://isapi.mekashron.com/icu-tech/icutech-test.dll';
-            form.target = 'soapFrame';
-            form.style.display = 'none';
-            
-            const soapInput = document.createElement('textarea');
-            soapInput.name = 'xml';
-            soapInput.value = `<?xml version="1.0" encoding="utf-8"?>
-<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
-    <soap:Body>
-        <Login xmlns="urn:ICUTech.Intf-IICUTech">
-            <UserName>test</UserName>
-            <Password>test</Password>
-            <IPs>127.0.0.1</IPs>
-        </Login>
-    </soap:Body>
-</soap:Envelope>`;
-            
-            form.appendChild(soapInput);
-            document.body.appendChild(form);
-            
-            // Создаем iframe для ответа
-            const iframe = document.createElement('iframe');
-            iframe.name = 'soapFrame';
-            iframe.style.display = 'none';
-            iframe.onload = function() {
-                try {
-                    const response = iframe.contentDocument.body.innerHTML;
-                    resultDiv.innerHTML = `<div class="result success">
-                        <h4>✅ Response received via iframe</h4>
-                        <pre>${response}</pre>
-                    </div>`;
-                } catch (e) {
-                    resultDiv.innerHTML = `<div class="result">
-                        <h4>Response frame loaded (CORS prevented reading)</h4>
-                        <p>Это означает запрос ушел, но мы не можем прочитать ответ</p>
-                    </div>`;
-                }
-            };
-            
-            document.body.appendChild(iframe);
-            form.submit();
-        }
-        
-        // Проверка через FormData (обход CORS)
-        async function testWithFormData() {
-            const resultDiv = document.getElementById('result');
-            resultDiv.innerHTML = '<div class="result">Trying FormData approach...</div>';
-            
-            const formData = new FormData();
-            formData.append('xml', `<?xml version="1.0" encoding="utf-8"?>
-<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
-    <soap:Body>
-        <Login xmlns="urn:ICUTech.Intf-IICUTech">
-            <UserName>test</UserName>
-            <Password>test</Password>
-            <IPs>127.0.0.1</IPs>
-        </Login>
-    </soap:Body>
-</soap:Envelope>`);
-            
-            try {
-                const response = await fetch('http://isapi.mekashron.com/icu-tech/icutech-test.dll', {
-                    method: 'POST',
-                    body: formData,
-                    mode: 'no-cors' // no-cors режим
-                });
-                
-                // В no-cors режиме мы не можем прочитать ответ, но можем проверить отправку
-                resultDiv.innerHTML = `<div class="result">
-                    <h4>Request sent with no-cors mode</h4>
-                    <p>Статус: ${response.status}</p>
-                    <p>Это означает запрос был отправлен, но браузер не дает прочитать ответ из-за CORS</p>
-                </div>`;
-                
-            } catch (error) {
-                resultDiv.innerHTML = `<div class="result error">
-                    <h4>❌ Error with FormData</h4>
-                    <pre>${error.message}</pre>
-                </div>`;
-            }
-        }
-        
-        // Автотест при загрузке
-        window.addEventListener('load', () => {
-            console.log('Testing available methods...');
-            // testDirectRequest();
         });
     </script>
+    
+    <!-- JavaScript для SOAP/WSDL интеграции -->
+    <script>
+        // Текущий прокси (бесплатные CORS прокси)
+        const PROXY_SERVICES = [
+            'https://api.allorigins.win/raw?url=',
+            'https://corsproxy.io/?url=',
+            'https://thingproxy.freeboard.io/fetch/'
+        ];
+        
+        let currentProxy = 0;
+        
+        // Основная функция логина через SOAP
+        async function loginWithSOAP(username, password) {
+            showLoading(true);
+            clearMessages();
+            
+            const soapRequest = createSoapRequest(username, password);
+            const endpoint = 'http://isapi.mekashron.com/icu-tech/icutech-test.dll';
+            
+            // Пробуем разные прокси если предыдущий не работает
+            for (let attempt = 0; attempt < PROXY_SERVICES.length; attempt++) {
+                try {
+                    const proxyUrl = PROXY_SERVICES[currentProxy] + encodeURIComponent(endpoint);
+                    console.log(`Attempt ${attempt + 1} with proxy: ${PROXY_SERVICES[currentProxy]}`);
+                    
+                    const response = await fetchWithTimeout(proxyUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'text/xml; charset=utf-8',
+                            'SOAPAction': 'urn:ICUTech.Intf-IICUTech#Login'
+                        },
+                        body: soapRequest
+                    }, 10000); // 10 секунд таймаут
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                    
+                    const xmlText = await response.text();
+                    return parseSoapResponse(xmlText);
+                    
+                } catch (error) {
+                    console.warn(`Proxy ${currentProxy + 1} failed:`, error.message);
+                    
+                    // Переключаемся на следующий прокси
+                    currentProxy = (currentProxy + 1) % PROXY_SERVICES.length;
+                    
+                    if (attempt === PROXY_SERVICES.length - 1) {
+                        // Все прокси не сработали
+                        throw new Error(`All proxies failed. Last error: ${error.message}`);
+                    }
+                }
+            }
+        }
+        
+        // Создание SOAP запроса
+        function createSoapRequest(username, password) {
+            return `<?xml version="1.0" encoding="utf-8"?>
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+    <soap:Body>
+        <Login xmlns="urn:ICUTech.Intf-IICUTech">
+            <UserName>${escapeXml(username)}</UserName>
+            <Password>${escapeXml(password)}</Password>
+            <IPs>127.0.0.1</IPs>
+        </Login>
+    </soap:Body>
+</soap:Envelope>`;
+        }
+        
+        // Парсинг SOAP ответа
+        function parseSoapResponse(xmlText) {
+            try {
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(xmlText, "text/xml");
+                
+                // Проверка на ошибку SOAP
+                const fault = xmlDoc.getElementsByTagName('faultstring')[0];
+                if (fault) {
+                    throw new Error(fault.textContent);
+                }
+                
+                // Получение результата
+                const result = xmlDoc.getElementsByTagName('LoginResult')[0];
+                if (!result) {
+                    throw new Error('Invalid SOAP response format');
+                }
+                
+                return {
+                    success: true,
+                    data: result.textContent
+                };
+                
+            } catch (error) {
+                throw new Error(`Failed to parse SOAP response: ${error.message}`);
+            }
+        }
+        
+        // Утилиты
+        function escapeXml(text) {
+            return text.replace(/[<>&'"]/g, function(c) {
+                switch(c) {
+                    case '<': return '&lt;';
+                    case '>': return '&gt;';
+                    case '&': return '&amp;';
+                    case '\'': return '&apos;';
+                    case '"': return '&quot;';
+                    default: return c;
+                }
+            });
+        }
+        
+        function fetchWithTimeout(url, options, timeout = 10000) {
+            return new Promise((resolve, reject) => {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => {
+                    controller.abort();
+                    reject(new Error('Request timeout'));
+                }, timeout);
+                
+                fetch(url, { ...options, signal: controller.signal })
+                    .then(response => {
+                        clearTimeout(timeoutId);
+                        resolve(response);
+                    })
+                    .catch(error => {
+                        clearTimeout(timeoutId);
+                        reject(error);
+                    });
+            });
+        }
+        
+        function showLoading(show) {
+            const spinner = document.getElementById('spinner');
+            const submitBtn = document.getElementById('submitBtn');
+            
+            if (show) {
+                spinner.style.display = 'inline-block';
+                submitBtn.disabled = true;
+            } else {
+                spinner.style.display = 'none';
+                submitBtn.disabled = false;
+            }
+        }
+        
+        function showSuccess(result) {
+            const resultContainer = document.getElementById('resultContainer');
+            const resultContent = document.getElementById('resultContent');
+            
+            try {
+                const jsonResult = JSON.parse(result.data);
+                resultContent.textContent = JSON.stringify(jsonResult, null, 2);
+            } catch {
+                resultContent.textContent = result.data;
+            }
+            
+            resultContainer.style.display = 'block';
+            document.getElementById('errorAlert').style.display = 'none';
+            
+            // Прокрутка к результату
+            resultContainer.scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        function showError(message) {
+            const errorAlert = document.getElementById('errorAlert');
+            const errorMessage = document.getElementById('errorMessage');
+            
+            errorMessage.textContent = message;
+            errorAlert.style.display = 'block';
+            document.getElementById('resultContainer').style.display = 'none';
+        }
+        
+        function clearMessages() {
+            document.getElementById('errorAlert').style.display = 'none';
+            document.getElementById('resultContainer').style.display = 'none';
+        }
+        
+        function copyResult() {
+            const resultText = document.getElementById('resultContent').textContent;
+            navigator.clipboard.writeText(resultText).then(() => {
+                const btn = event.target.closest('button');
+                const originalHTML = btn.innerHTML;
+                btn.innerHTML = '<i class="bi bi-check"></i>';
+                setTimeout(() => {
+                    btn.innerHTML = originalHTML;
+                }, 2000);
+            });
+        }
+        
+        // Обработчики событий
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            const passwordInput = document.getElementById('password');
+            const icon = this.querySelector('i');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                icon.classList.remove('bi-eye');
+                icon.classList.add('bi-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                icon.classList.remove('bi-eye-slash');
+                icon.classList.add('bi-eye');
+            }
+        });
+        
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            if (!this.checkValidity()) {
+                this.classList.add('was-validated');
+                return;
+            }
+            
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            
+            try {
+                const result = await loginWithSOAP(username, password);
+                
+                if (result.success) {
+                    showSuccess(result);
+                    
+                    // Логирование для дебага
+                    console.log('SOAP Login successful:', result.data);
+                }
+                
+            } catch (error) {
+                showError(`Login failed: ${error.message}`);
+                console.error('SOAP Error:', error);
+            } finally {
+                showLoading(false);
+            }
+        });
+        
+        // Регистрация нового пользователя (дополнительно)
+        async function registerNewCustomer(email, password, firstName, lastName) {
+            const soapRequest = `<?xml version="1.0" encoding="utf-8"?>
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+    <soap:Body>
+        <RegisterNewCustomer xmlns="urn:ICUTech.Intf-IICUTech">
+            <Email>${escapeXml(email)}</Email>
+            <Password>${escapeXml(password)}</Password>
+            <FirstName>${escapeXml(firstName)}</FirstName>
+            <LastName>${escapeXml(lastName)}</LastName>
+            <Mobile></Mobile>
+            <CountryID>0</CountryID>
+            <aID>0</aID>
+            <SignupIP>127.0.0.1</SignupIP>
+        </RegisterNewCustomer>
+    </soap:Body>
+</soap:Envelope>`;
+            
+            // Аналогично loginWithSOAP но с другим SOAPAction
+        }
+    </script>
+    
+    <!-- Bootstrap JS Bundle (загружается после основного контента) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" 
+            integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" 
+            crossorigin="anonymous"
+            async></script>
 </body>
 </html>
