@@ -3,129 +3,330 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Login">
-    <title>Mekashron .NET Developer Test</title>
+    <meta name="description" content="Mekashron SOAP/WSDL Login Test">
+    <title>Mekashron Login</title>
     
-    <!-- Bootstrap 5 CSS (оптимизировано для PageSpeed 100) -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" 
-          integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" 
-          crossorigin="anonymous" 
-          media="print" 
-          onload="this.media='all'">
-    
-    <!-- Критический CSS встроен для производительности -->
+    <!-- Inline critical CSS for maximum performance -->
     <style>
+        /*! Critical CSS only - everything needed for above-the-fold content */
         :root {
             --primary: #0d6efd;
             --success: #198754;
             --danger: #dc3545;
-            --dark: #212529;
         }
         
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-           
         }
         
         body {
             min-height: 100vh;
             display: flex;
             align-items: center;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            font-family: system-ui, -apple-system, sans-serif;
+            background: #f8f9fa;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            line-height: 1.5;
             padding: 1rem;
-             font-display:swap;
         }
         
         .login-card {
-            background: white;
-            border-radius: 1rem;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            overflow: hidden;
+            background: #fff;
+            border-radius: 0.75rem;
+            box-shadow: 0 0.25rem 0.75rem rgba(0,0,0,0.08);
             width: 100%;
-            max-width: 420px;
+            max-width: 24rem;
             margin: 0 auto;
+            overflow: hidden;
         }
         
         .login-header {
-            background: var(--dark);
-            color: white;
-            padding: 2rem;
+            background: #212529;
+            color: #fff;
+            padding: 1.5rem 1rem;
             text-align: center;
         }
         
         .login-body {
-            padding: 2rem;
+            padding: 1.5rem;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.375rem;
+            font-weight: 500;
+            color: #212529;
         }
         
         .form-control {
-            padding: 0.75rem 1rem;
-            border: 2px solid #dee2e6;
-            border-radius: 0.5rem;
-            transition: all 0.3s;
+            width: 100%;
+            padding: 0.625rem 0.75rem;
+            border: 1px solid #ced4da;
+            border-radius: 0.375rem;
+            font-size: 1rem;
+            line-height: 1.5;
+            transition: border-color 0.15s;
         }
         
         .form-control:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+            border-color: #86b7fe;
+            outline: 0;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
         }
         
-        .btn-login {
-            padding: 0.75rem;
-            font-weight: 600;
-            transition: all 0.3s;
+        .btn {
+            display: inline-block;
+            padding: 0.625rem 1rem;
+            border: 1px solid transparent;
+            border-radius: 0.375rem;
+            font-size: 1rem;
+            font-weight: 500;
+            line-height: 1.5;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.15s;
+            user-select: none;
         }
         
-        .result-card {
-            border: none;
-            border-radius: 0.5rem;
-            overflow: hidden;
+        .btn-primary {
+            color: #fff;
+            background-color: #0d6efd;
+            border-color: #0d6efd;
+        }
+        
+        .btn-primary:hover {
+            background-color: #0b5ed7;
+            border-color: #0a58ca;
+        }
+        
+        .btn-outline-secondary {
+            color: #6c757d;
+            background-color: transparent;
+            border-color: #ced4da;
+        }
+        
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+            border-radius: 0.25rem;
+        }
+        
+        .input-group {
+            position: relative;
+            display: flex;
+            width: 100%;
+        }
+        
+        .input-group .form-control {
+            flex: 1 1 auto;
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+        
+        .input-group .btn {
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+            margin-left: -1px;
+        }
+        
+        .alert {
+            padding: 1rem;
+            border: 1px solid transparent;
+            border-radius: 0.375rem;
             display: none;
         }
         
-        .performance-badge {
-            font-size: 0.75rem;
+        .alert-danger {
+            color: #842029;
+            background-color: #f8d7da;
+            border-color: #f5c2c7;
+        }
+        
+        .alert-success {
+            color: #0f5132;
+            background-color: #d1e7dd;
+            border-color: #badbcc;
+        }
+        
+        .card {
+            border: 1px solid rgba(0,0,0,.125);
+            border-radius: 0.375rem;
+            display: none;
+        }
+        
+        .card-header {
+            padding: 0.75rem 1rem;
+            background-color: #198754;
+            color: #fff;
+            border-bottom: 1px solid rgba(0,0,0,.125);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .card-body {
+            padding: 1rem;
+        }
+        
+        .badge {
+            display: inline-block;
             padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            line-height: 1;
+            text-align: center;
+            white-space: nowrap;
             border-radius: 1rem;
         }
         
+        .bg-success {
+            background-color: #198754 !important;
+        }
+        
+        .bg-primary {
+            background-color: #0d6efd !important;
+        }
+        
+        .bg-dark {
+            background-color: #212529 !important;
+        }
+        
+        .text-white {
+            color: #fff !important;
+        }
+        
+        .text-center {
+            text-align: center !important;
+        }
+        
+        .mt-3 {
+            margin-top: 1rem !important;
+        }
+        
+        .mt-4 {
+            margin-top: 1.5rem !important;
+        }
+        
+        .mb-0 {
+            margin-bottom: 0 !important;
+        }
+        
+        .mb-2 {
+            margin-bottom: 0.5rem !important;
+        }
+        
+        .mb-3 {
+            margin-bottom: 1rem !important;
+        }
+        
+        .me-2 {
+            margin-right: 0.5rem !important;
+        }
+        
+        .d-flex {
+            display: flex !important;
+        }
+        
+        .justify-content-center {
+            justify-content: center !important;
+        }
+        
+        .justify-content-between {
+            justify-content: space-between !important;
+        }
+        
+        .align-items-center {
+            align-items: center !important;
+        }
+        
+        .flex-wrap {
+            flex-wrap: wrap !important;
+        }
+        
+        .gap-2 {
+            gap: 0.5rem !important;
+        }
+        
+        .w-100 {
+            width: 100% !important;
+        }
+        
+        .invalid-feedback {
+            display: none;
+            width: 100%;
+            margin-top: 0.25rem;
+            font-size: 0.875rem;
+            color: #dc3545;
+        }
+        
+        .was-validated .form-control:invalid ~ .invalid-feedback {
+            display: block;
+        }
+        
+        .spinner-border {
+            display: inline-block;
+            width: 1rem;
+            height: 1rem;
+            border: 0.2em solid currentColor;
+            border-right-color: transparent;
+            border-radius: 50%;
+            animation: spinner-border .75s linear infinite;
+            vertical-align: -0.125em;
+        }
+        
+        @keyframes spinner-border {
+            to { transform: rotate(360deg); }
+        }
+        
+        pre {
+            font-family: monospace;
+            font-size: 0.875rem;
+            margin: 0;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        
         /* Mobile optimizations */
-        @media (max-width: 576px) {
-            .login-card {
-                margin: 0.5rem;
+        @media (max-width: 480px) {
+            body {
+                padding: 0.5rem;
             }
+            
             .login-body {
-                padding: 1.5rem;
+                padding: 1rem;
+            }
+            
+            .login-header {
+                padding: 1rem;
+            }
+        }
+        
+        @media (max-width: 360px) {
+            .login-card {
+                border-radius: 0;
             }
         }
     </style>
     
-    <!-- Preload Bootstrap Icons -->
-    <link rel="preload" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" as="style">
+    <!-- Preconnect to CDN -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
 </head>
 <body>
     <!-- Main Container -->
     <main class="login-card">
         <!-- Header -->
         <div class="login-header">
-            <h2 class="h4 mb-2">
-                <i class="bi bi-shield-lock"></i> Mekashron Login
-            </h2>
-            <p class="small opacity-75 mb-0">
-                SOAP/WSDL Web Service Integration
-            </p>
+            <h2 style="font-size: 1.25rem; margin: 0 0 0.5rem 0;">Mekashron Login</h2>
+            <p style="font-size: 0.875rem; opacity: 0.8; margin: 0;">SOAP/WSDL Integration</p>
         </div>
         
         <!-- Login Form -->
         <div class="login-body">
             <form id="loginForm" novalidate>
-                <!-- Username Field -->
+                <!-- Username -->
                 <div class="mb-3">
-                    <label for="username" class="form-label">
-                        <i class="bi bi-person-fill"></i> Username
-                    </label>
+                    <label for="username" class="form-label">Username</label>
                     <input type="text" 
                            class="form-control" 
                            id="username"
@@ -138,11 +339,9 @@
                     </div>
                 </div>
                 
-                <!-- Password Field -->
+                <!-- Password -->
                 <div class="mb-3">
-                    <label for="password" class="form-label">
-                        <i class="bi bi-key-fill"></i> Password
-                    </label>
+                    <label for="password" class="form-label">Password</label>
                     <div class="input-group">
                         <input type="password" 
                                class="form-control" 
@@ -151,8 +350,8 @@
                                value="test"
                                required
                                autocomplete="current-password">
-                        <button class="btn btn-outline-secondary" type="button" id="togglePassword">
-                            <i class="bi bi-eye"></i>
+                        <button class="btn btn-outline-secondary" type="button" id="togglePassword" aria-label="Show password">
+                            👁
                         </button>
                     </div>
                     <div class="invalid-feedback">
@@ -160,130 +359,59 @@
                     </div>
                 </div>
                 
-                <!-- Submit Button -->
-                <button type="submit" class="btn btn-primary btn-login w-100" id="submitBtn">
-                    <span class="spinner-border spinner-border-sm me-2" id="spinner" style="display: none;"></span>
-                    <i class="bi bi-box-arrow-in-right me-2"></i>
+                <!-- Submit -->
+                <button type="submit" class="btn btn-primary w-100" id="submitBtn">
+                    <span class="spinner-border" id="spinner" style="display: none; margin-right: 0.5rem;"></span>
                     Login via SOAP
                 </button>
             </form>
             
-            <!-- Result Display -->
-            <div class="result-card mt-4" id="resultContainer">
-                <div class="card">
-                    <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
-                        <span><i class="bi bi-check-circle-fill me-2"></i>Login Successful</span>
-                        <button class="btn btn-sm btn-light" onclick="copyResult()">
-                            <i class="bi bi-clipboard"></i>
-                        </button>
-                    </div>
-                    <div class="card-body">
-                        <pre class="mb-0" id="resultContent" style="font-size: 0.875rem;"></pre>
-                    </div>
+            <!-- Result -->
+            <div class="card mt-4" id="resultContainer">
+                <div class="card-header">
+                    <span>Login Successful</span>
+                    <button class="btn btn-sm" style="background: #fff; color: #198754;" onclick="copyResult()" aria-label="Copy result">
+                        📋
+                    </button>
+                </div>
+                <div class="card-body">
+                    <pre id="resultContent" style="max-height: 12rem; overflow-y: auto;"></pre>
                 </div>
             </div>
             
-            <!-- Error Message -->
+            <!-- Error -->
             <div class="alert alert-danger mt-3" id="errorAlert" role="alert" style="display: none;">
-                <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                <span id="errorMessage"></span>
+                ❌ <span id="errorMessage"></span>
             </div>
             
-            
-            
-            <!-- Performance Info -->
+            <!-- Performance badges -->
             <div class="text-center mt-4">
                 <div class="d-flex justify-content-center gap-2 flex-wrap">
-                    <span class="performance-badge bg-success text-white">
-                        <i class="bi bi-speedometer2"></i> PageSpeed 100
-                    </span>
-                    <span class="performance-badge bg-primary text-white">
-                        <i class="bi bi-phone"></i> Mobile First
-                    </span>
-                    <span class="performance-badge bg-dark text-white">
-                        <i class="bi bi-shield-check"></i> SOAP Secure
-                    </span>
+                    <span class="badge bg-success text-white">PageSpeed 100</span>
+                    <span class="badge bg-primary text-white">Mobile First</span>
+                    <span class="badge bg-dark text-white">SOAP Secure</span>
                 </div>
             </div>
         </div>
     </main>
 
-    <!-- Load non-critical resources after page load -->
-    <script>
-        // Load Bootstrap Icons after page load
-        window.addEventListener('load', function() {
-            const link = document.createElement('link');
-            link.rel = 'stylesheet';
-            link.href = 'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css';
-            document.head.appendChild(link);
-            
-            // Performance measurement
-            if ('performance' in window) {
-                const timing = performance.timing;
-                const loadTime = timing.loadEventEnd - timing.navigationStart;
-                console.log(`Page loaded in ${loadTime}ms`);
-            }
-        });
-    </script>
+    <!-- Non-critical CSS loaded after page render -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" 
+          media="print" 
+          onload="this.media='all'; this.onload=null;" 
+          crossorigin="anonymous">
     
-    <!-- JavaScript для SOAP/WSDL интеграции -->
+    <!-- JavaScript -->
     <script>
-        // Текущий прокси (бесплатные CORS прокси)
-        const PROXY_SERVICES = [
-            'https://api.allorigins.win/raw?url=',
-            'https://corsproxy.io/?url=',
-            'https://thingproxy.freeboard.io/fetch/'
-        ];
+        // Используем самую надежную бесплатную прокси
+        const PROXY_URL = 'https://api.allorigins.win/raw?url=';
         
-        let currentProxy = 0;
-        
-        // Основная функция логина через SOAP
+        // Основные функции
         async function loginWithSOAP(username, password) {
             showLoading(true);
             clearMessages();
             
-            const soapRequest = createSoapRequest(username, password);
-            const endpoint = 'http://isapi.mekashron.com/icu-tech/icutech-test.dll';
-            
-            // Пробуем разные прокси если предыдущий не работает
-            for (let attempt = 0; attempt < PROXY_SERVICES.length; attempt++) {
-                try {
-                    const proxyUrl = PROXY_SERVICES[currentProxy] + encodeURIComponent(endpoint);
-                    console.log(`Attempt ${attempt + 1} with proxy: ${PROXY_SERVICES[currentProxy]}`);
-                    
-                    const response = await fetchWithTimeout(proxyUrl, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'text/xml; charset=utf-8',
-                            'SOAPAction': 'urn:ICUTech.Intf-IICUTech#Login'
-                        },
-                        body: soapRequest
-                    }, 10000); // 10 секунд таймаут
-                    
-                    if (!response.ok) {
-                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                    }
-                    
-                    const xmlText = await response.text();
-                    return parseSoapResponse(xmlText);
-                    
-                } catch (error) {
-                    console.warn(`Proxy ${currentProxy + 1} failed:`, error.message);
-                    
-                    // Переключаемся на следующий прокси
-                    currentProxy = (currentProxy + 1) % PROXY_SERVICES.length;
-                    
-                    if (attempt === PROXY_SERVICES.length - 1) {
-                        // Все прокси не сработали
-                        throw new Error(`All proxies failed. Last error: ${error.message}`);
-                    }
-                }
-            }
-        }
-        
-        // Создание SOAP запроса
-        function createSoapRequest(username, password) {
-            return `<?xml version="1.0" encoding="utf-8"?>
+            const soapRequest = `<?xml version="1.0" encoding="utf-8"?>
 <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
     <soap:Body>
         <Login xmlns="urn:ICUTech.Intf-IICUTech">
@@ -293,37 +421,53 @@
         </Login>
     </soap:Body>
 </soap:Envelope>`;
-        }
-        
-        // Парсинг SOAP ответа
-        function parseSoapResponse(xmlText) {
+            
+            const endpoint = 'http://isapi.mekashron.com/icu-tech/icutech-test.dll';
+            
             try {
-                const parser = new DOMParser();
-                const xmlDoc = parser.parseFromString(xmlText, "text/xml");
+                const controller = new AbortController();
+                setTimeout(() => controller.abort(), 8000);
                 
-                // Проверка на ошибку SOAP
-                const fault = xmlDoc.getElementsByTagName('faultstring')[0];
-                if (fault) {
-                    throw new Error(fault.textContent);
-                }
+                const response = await fetch(PROXY_URL + encodeURIComponent(endpoint), {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'text/xml; charset=utf-8',
+                        'SOAPAction': 'urn:ICUTech.Intf-IICUTech#Login'
+                    },
+                    body: soapRequest,
+                    signal: controller.signal
+                });
                 
-                // Получение результата
-                const result = xmlDoc.getElementsByTagName('LoginResult')[0];
-                if (!result) {
-                    throw new Error('Invalid SOAP response format');
-                }
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 
-                return {
-                    success: true,
-                    data: result.textContent
-                };
+                const xmlText = await response.text();
+                return parseSoapResponse(xmlText);
                 
             } catch (error) {
-                throw new Error(`Failed to parse SOAP response: ${error.message}`);
+                throw new Error(`Connection failed: ${error.message}`);
             }
         }
         
-        // Утилиты
+        function parseSoapResponse(xmlText) {
+            try {
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
+                
+                const fault = xmlDoc.querySelector('faultstring');
+                if (fault) throw new Error(fault.textContent || 'SOAP error');
+                
+                const result = xmlDoc.querySelector('LoginResult');
+                if (!result) throw new Error('Invalid response format');
+                
+                return {
+                    success: true,
+                    data: result.textContent.trim()
+                };
+            } catch (error) {
+                throw new Error(`Parse error: ${error.message}`);
+            }
+        }
+        
         function escapeXml(text) {
             return text.replace(/[<>&'"]/g, function(c) {
                 switch(c) {
@@ -332,68 +476,48 @@
                     case '&': return '&amp;';
                     case '\'': return '&apos;';
                     case '"': return '&quot;';
-                    default: return c;
                 }
-            });
-        }
-        
-        function fetchWithTimeout(url, options, timeout = 10000) {
-            return new Promise((resolve, reject) => {
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => {
-                    controller.abort();
-                    reject(new Error('Request timeout'));
-                }, timeout);
-                
-                fetch(url, { ...options, signal: controller.signal })
-                    .then(response => {
-                        clearTimeout(timeoutId);
-                        resolve(response);
-                    })
-                    .catch(error => {
-                        clearTimeout(timeoutId);
-                        reject(error);
-                    });
+                return c;
             });
         }
         
         function showLoading(show) {
             const spinner = document.getElementById('spinner');
-            const submitBtn = document.getElementById('submitBtn');
+            const btn = document.getElementById('submitBtn');
             
             if (show) {
                 spinner.style.display = 'inline-block';
-                submitBtn.disabled = true;
+                btn.disabled = true;
+                btn.textContent = ' Connecting...';
             } else {
                 spinner.style.display = 'none';
-                submitBtn.disabled = false;
+                btn.disabled = false;
+                btn.textContent = 'Login via SOAP';
             }
         }
         
         function showSuccess(result) {
-            const resultContainer = document.getElementById('resultContainer');
-            const resultContent = document.getElementById('resultContent');
+            const container = document.getElementById('resultContainer');
+            const content = document.getElementById('resultContent');
             
             try {
-                const jsonResult = JSON.parse(result.data);
-                resultContent.textContent = JSON.stringify(jsonResult, null, 2);
+                const json = JSON.parse(result.data);
+                content.textContent = JSON.stringify(json, null, 2);
             } catch {
-                resultContent.textContent = result.data;
+                content.textContent = result.data;
             }
             
-            resultContainer.style.display = 'block';
+            container.style.display = 'block';
             document.getElementById('errorAlert').style.display = 'none';
             
-            // Прокрутка к результату
-            resultContainer.scrollIntoView({ behavior: 'smooth' });
+            // Smooth scroll
+            setTimeout(() => container.scrollIntoView({ behavior: 'smooth' }), 100);
         }
         
         function showError(message) {
-            const errorAlert = document.getElementById('errorAlert');
-            const errorMessage = document.getElementById('errorMessage');
-            
-            errorMessage.textContent = message;
-            errorAlert.style.display = 'block';
+            const alert = document.getElementById('errorAlert');
+            document.getElementById('errorMessage').textContent = message;
+            alert.style.display = 'block';
             document.getElementById('resultContainer').style.display = 'none';
         }
         
@@ -403,30 +527,24 @@
         }
         
         function copyResult() {
-            const resultText = document.getElementById('resultContent').textContent;
-            navigator.clipboard.writeText(resultText).then(() => {
-                const btn = event.target.closest('button');
-                const originalHTML = btn.innerHTML;
-                btn.innerHTML = '<i class="bi bi-check"></i>';
-                setTimeout(() => {
-                    btn.innerHTML = originalHTML;
-                }, 2000);
+            const text = document.getElementById('resultContent').textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = event.currentTarget;
+                const original = btn.innerHTML;
+                btn.innerHTML = '✓';
+                setTimeout(() => btn.innerHTML = original, 1500);
             });
         }
         
-        // Обработчики событий
+        // Event handlers
         document.getElementById('togglePassword').addEventListener('click', function() {
-            const passwordInput = document.getElementById('password');
-            const icon = this.querySelector('i');
-            
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                icon.classList.remove('bi-eye');
-                icon.classList.add('bi-eye-slash');
+            const input = document.getElementById('password');
+            if (input.type === 'password') {
+                input.type = 'text';
+                this.textContent = '🙈';
             } else {
-                passwordInput.type = 'password';
-                icon.classList.remove('bi-eye-slash');
-                icon.classList.add('bi-eye');
+                input.type = 'password';
+                this.textContent = '👁';
             }
         });
         
@@ -443,48 +561,33 @@
             
             try {
                 const result = await loginWithSOAP(username, password);
-                
-                if (result.success) {
-                    showSuccess(result);
-                    
-                    // Логирование для дебага
-                    console.log('SOAP Login successful:', result.data);
-                }
-                
+                if (result.success) showSuccess(result);
             } catch (error) {
-                showError(`Login failed: ${error.message}`);
-                console.error('SOAP Error:', error);
+                showError(error.message);
             } finally {
                 showLoading(false);
             }
         });
         
-        // Регистрация нового пользователя (дополнительно)
-        async function registerNewCustomer(email, password, firstName, lastName) {
-            const soapRequest = `<?xml version="1.0" encoding="utf-8"?>
-<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
-    <soap:Body>
-        <RegisterNewCustomer xmlns="urn:ICUTech.Intf-IICUTech">
-            <Email>${escapeXml(email)}</Email>
-            <Password>${escapeXml(password)}</Password>
-            <FirstName>${escapeXml(firstName)}</FirstName>
-            <LastName>${escapeXml(lastName)}</LastName>
-            <Mobile></Mobile>
-            <CountryID>0</CountryID>
-            <aID>0</aID>
-            <SignupIP>127.0.0.1</SignupIP>
-        </RegisterNewCustomer>
-    </soap:Body>
-</soap:Envelope>`;
+        // Performance optimization
+        window.addEventListener('load', function() {
+            // Загружаем иконки только если нужны
+            if (document.fonts && document.fonts.ready) {
+                document.fonts.ready.then(() => {
+                    // Можно загрузить иконки если нужно
+                });
+            }
             
-            // Аналогично loginWithSOAP но с другим SOAPAction
-        }
+            // Убираем возможный layout shift
+            const btn = document.getElementById('submitBtn');
+            btn.style.minHeight = btn.offsetHeight + 'px';
+        });
     </script>
     
-    <!-- Bootstrap JS Bundle (загружается после основного контента) -->
+    <!-- Bootstrap JS (загружается асинхронно и только для интерактивности) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" 
-            integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" 
             crossorigin="anonymous"
-            async></script>
+            async
+            defer></script>
 </body>
 </html>
