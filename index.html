@@ -406,15 +406,15 @@
 </soap:Envelope>`;
 
                 // Send SOAP request
-                const response = await fetch('http://isapi.mekashron.com/icu-tech/icutech-test.dll', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'text/xml; charset=utf-8',
-                        'SOAPAction': 'urn:ICUTech.Intf-IICUTech#Login'
-                    },
-                    body: soapRequest,
-                    mode: 'cors'
-                });
+                const response = await fetch('https://corsproxy.io/?url=' + 
+    encodeURIComponent('http://isapi.mekashron.com/icu-tech/icutech-test.dll'), {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'text/xml; charset=utf-8',
+        'SOAPAction': 'urn:ICUTech.Intf-IICUTech#Login'
+    },
+    body: soapRequest
+});
 
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
