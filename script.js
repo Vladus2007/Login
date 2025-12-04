@@ -17,7 +17,7 @@ async function loginWithSOAP(username, password) {
     </soap:Body>
 </soap:Envelope>`;
     
-    const endpoint = 'http://isapi.mekashron.com/icu-tech/icutech-test.dll';
+   const endpoint = 'http://isapi.mekashron.com/icu-tech/icu-tech-test.dll';
     
     try {
         const controller = new AbortController();
