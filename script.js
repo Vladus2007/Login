@@ -17,8 +17,8 @@ async function loginWithSOAP(username, password) {
     </soap:Body>
 </soap:Envelope>`;
     
-   const endpoint = 'http://isapi.mekashron.com/icu-tech/icu-tech-test.dll';
-    
+   //const endpoint = 'http://isapi.mekashron.com/icu-tech/icu-tech-test.dll';
+    const endpoin='http://www.borland.com/namespaces/Types';
     try {
         const controller = new AbortController();
         setTimeout(() => controller.abort(), 8000);
