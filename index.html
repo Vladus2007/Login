@@ -4,10 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mekashron Login</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             display: flex;
@@ -15,114 +17,157 @@
             justify-content: center;
             padding: 1rem;
         }
-        .container {
-            background: white;
+        
+        .login-card {
             border-radius: 12px;
-            padding: 2rem;
             box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-            width: 100%;
-            max-width: 400px;
-        }
-        h2 { text-align: center; margin-bottom: 1.5rem; color: #333; }
-        .form-group { margin-bottom: 1rem; }
-        label { display: block; margin-bottom: 0.5rem; font-weight: 500; color: #555; }
-        input {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            font-size: 1rem;
-        }
-        .btn {
-            width: 100%;
-            padding: 0.75rem;
-            background: #4a90e2;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 1rem;
-            font-weight: 500;
-            cursor: pointer;
-            margin-top: 1rem;
-        }
-        .btn:disabled { opacity: 0.6; cursor: not-allowed; }
-        .alert {
-            padding: 1rem;
-            border-radius: 6px;
-            margin-top: 1rem;
-            display: none;
-        }
-        .error { background: #fee; border: 1px solid #fcc; color: #c00; }
-        .success { background: #efe; border: 1px solid #cfc; color: #0a0; }
-        .result {
-            margin-top: 1rem;
-            border: 1px solid #ddd;
-            border-radius: 6px;
             overflow: hidden;
+            max-width: 450px;
+            width: 100%;
+        }
+        
+        .card-header {
+            background-color: #4a90e2;
+            color: white;
+            text-align: center;
+            padding: 1.5rem;
+        }
+        
+        .card-body {
+            padding: 2rem;
+        }
+        
+        .form-control:focus {
+            border-color: #4a90e2;
+            box-shadow: 0 0 0 0.25rem rgba(74, 144, 226, 0.25);
+        }
+        
+        .btn-login {
+            background-color: #4a90e2;
+            border-color: #4a90e2;
+            padding: 0.75rem;
+            font-weight: 500;
+            width: 100%;
+        }
+        
+        .btn-login:hover {
+            background-color: #3a80d2;
+            border-color: #3a80d2;
+        }
+        
+        .btn-login:disabled {
+            background-color: #6ca5e8;
+            border-color: #6ca5e8;
+        }
+        
+        .spinner-border {
+            width: 1rem;
+            height: 1rem;
+            border-width: 0.15em;
+            margin-right: 0.5rem;
+            vertical-align: middle;
+        }
+        
+        .result-container {
+            border-radius: 8px;
+            overflow: hidden;
+            margin-top: 1rem;
             display: none;
         }
+        
         .result-header {
-            background: #4caf50;
-            color: white;
             padding: 0.75rem 1rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            color: white;
         }
-        pre {
+        
+        .result-success {
+            background-color: #28a745;
+        }
+        
+        .result-error {
+            background-color: #dc3545;
+        }
+        
+        .result-warning {
+            background-color: #ffc107;
+            color: #212529;
+        }
+        
+        .result-content {
             padding: 1rem;
-            background: #f9f9f9;
-            overflow: auto;
+            background-color: #f8f9fa;
             max-height: 300px;
+            overflow-y: auto;
             font-size: 0.875rem;
             margin: 0;
         }
-        .spinner {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 2px solid rgba(255,255,255,0.3);
-            border-radius: 50%;
-            border-top-color: white;
-            animation: spin 1s ease-in-out infinite;
-            margin-right: 10px;
+        
+        .copy-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: inherit;
+            border-radius: 4px;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
         }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+        
+        .copy-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h2>🔐 Mekashron Login</h2>
-        
-        <form id="loginForm">
-            <div class="form-group">
-                <label for="username">Username:</label>
-                <input type="text" id="username" value="test" required>
-            </div>
+    <div class="login-card card">
+        <div class="card-header">
+            <h3 class="mb-0"><i class="bi bi-shield-lock"></i> Mekashron Login</h3>
             
-            <div class="form-group">
-                <label for="password">Password:</label>
-                <input type="password" id="password" value="test" required>
-            </div>
-            
-            <button type="submit" id="submitBtn" class="btn">
-                <span id="spinner" style="display:none;" class="spinner"></span>
-                Login via SOAP
-            </button>
-        </form>
+        </div>
         
-        <div id="errorAlert" class="alert error"></div>
-        
-        <div id="resultContainer" class="result">
-            <div class="result-header">
-                <span>✅ Login Successful</span>
+        <div class="card-body">
+            <form id="loginForm">
+                <div class="mb-3">
+                    <label for="username" class="form-label">Username</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-person"></i></span>
+                        <input type="text" class="form-control" id="username" placeholder="Enter username" required>
+                    </div>
+                </div>
                 
+                <div class="mb-4">
+                    <label for="password" class="form-label">Password</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-key"></i></span>
+                        <input type="password" class="form-control" id="password" placeholder="Enter password" required>
+                    </div>
+                </div>
+                
+                <button type="submit" id="submitBtn" class="btn btn-login btn-lg">
+                    <span id="spinner" class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display: none;"></span>
+                    <span id="btnText">Login via SOAP</span>
+                </button>
+            </form>
+            
+            <div id="errorAlert" class="alert alert-danger mt-3" role="alert" style="display: none;"></div>
+            
+            <div id="resultContainer" class="result-container">
+                <div id="resultMessage" class="result-header">
+                    <span id="resultTitle"></span>
+                    <button class="copy-btn" onclick="copyResult()">
+                        <i class="bi bi-clipboard"></i> Copy
+                    </button>
+                </div>
+                <pre id="resultContent" class="result-content"></pre>
             </div>
-            <pre id="resultContent"></pre>
+            
+           
         </div>
     </div>
+
+    <!-- Bootstrap 5 JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
         // ✅ CONFIGURATION - WORKING ENDPOINT
@@ -134,20 +179,27 @@
         const loginForm = document.getElementById('loginForm');
         const submitBtn = document.getElementById('submitBtn');
         const spinner = document.getElementById('spinner');
+        const btnText = document.getElementById('btnText');
         const errorAlert = document.getElementById('errorAlert');
         const resultContainer = document.getElementById('resultContainer');
         const resultContent = document.getElementById('resultContent');
+        const resultTitle = document.getElementById('resultTitle');
+        const resultMessage = document.getElementById('resultMessage');
         
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('✅ Mekashron Login initialized');
-            console.log('Endpoint:', ENDPOINT);
+            console.log('✅ Mekashron Login initialized with Bootstrap');
             
             // Form submission
             loginForm.addEventListener('submit', async function(e) {
                 e.preventDefault();
                 await handleLogin();
             });
+            
+            // Test with sample credentials (optional - remove in production)
+            // Uncomment for testing:
+            // document.getElementById('username').value = 'test@example.com';
+            // document.getElementById('password').value = 'password123';
         });
         
         // Main login handler
@@ -156,7 +208,7 @@
             const password = document.getElementById('password').value;
             
             if (!username || !password) {
-                showError('Please enter username and password');
+                showError('Please enter both username and password');
                 return;
             }
             
@@ -164,13 +216,11 @@
             clearMessages();
             
             try {
-                // 1. Create SOAP request with proper namespace
+                // 1. Create SOAP request
                 const soapRequest = createSoapRequest(username, password);
-                console.log('SOAP Request:', soapRequest);
                 
                 // 2. Prepare proxy URL
                 const proxyUrl = PROXY + encodeURIComponent(ENDPOINT);
-                console.log('Proxy URL:', proxyUrl);
                 
                 // 3. Send request
                 const response = await fetchWithTimeout(proxyUrl, {
@@ -184,8 +234,6 @@
                     mode: 'cors'
                 }, 15000);
                 
-                console.log('Response status:', response.status);
-                
                 if (!response.ok) {
                     const errorText = await response.text();
                     throw new Error(`Server error: ${response.status} ${response.statusText}`);
@@ -193,13 +241,10 @@
                 
                 // 4. Get response
                 const xmlText = await response.text();
-                console.log('Raw response:', xmlText);
                 
-                // 5. Parse response
+                // 5. Parse and display result
                 const result = parseSoapResponse(xmlText);
-                
-                // 6. Show success
-                showResult(result);
+                displayResult(result);
                 
             } catch (error) {
                 console.error('Login error:', error);
@@ -209,7 +254,7 @@
             }
         }
         
-        // Create SOAP XML with correct namespace
+        // Create SOAP XML
         function createSoapRequest(username, password) {
             return `<?xml version="1.0" encoding="utf-8"?>
 <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
@@ -227,76 +272,116 @@
         
         // Parse SOAP response
         function parseSoapResponse(xmlText) {
-            console.log('Parsing response...');
-            
             try {
                 const parser = new DOMParser();
                 const xmlDoc = parser.parseFromString(xmlText, "text/xml");
-                
-                // Check for parser errors
-                const parserError = xmlDoc.querySelector('parsererror');
-                if (parserError) {
-                    console.error('XML Parse Error:', parserError.textContent);
-                    throw new Error('Invalid XML response from server');
-                }
                 
                 // Check for SOAP fault
                 const fault = xmlDoc.querySelector('faultstring');
                 if (fault && fault.textContent) {
                     const faultText = fault.textContent.trim();
-                    console.log('SOAP Fault:', faultText);
-                    
                     if (faultText.toLowerCase().includes('wrong') || 
                         faultText.toLowerCase().includes('password') ||
                         faultText.toLowerCase().includes('invalid')) {
-                        throw new Error('Wrong username or password');
+                        return {
+                            success: false,
+                            type: 'auth_error',
+                            message: 'Wrong username or password',
+                            data: faultText
+                        };
                     }
-                    throw new Error(`Server error: ${faultText}`);
+                    return {
+                        success: false,
+                        type: 'server_error',
+                        message: `Server error: ${faultText}`,
+                        data: faultText
+                    };
                 }
                 
-                // Look for LoginResult in different namespaces
-                const namespaces = ['', 'ns1:', 'ns2:', 'm:', 'SOAP-ENV:'];
-                let resultElement = null;
-                
-                for (const ns of namespaces) {
-                    resultElement = xmlDoc.querySelector(`${ns}LoginResult, ${ns}return`);
-                    if (resultElement) {
-                        console.log(`Found result in namespace: ${ns}`);
-                        break;
-                    }
-                }
-                
-                // If still not found, try to find any element with JSON
-                if (!resultElement) {
-                    const allElements = xmlDoc.getElementsByTagName('*');
-                    for (let elem of allElements) {
-                        const text = elem.textContent.trim();
-                        if (text && (text.startsWith('{') || text.includes('EntityID'))) {
-                            resultElement = elem;
-                            console.log('Found result in element:', elem.nodeName);
-                            break;
-                        }
-                    }
-                }
-                
+                // Find result element
+                const resultElement = xmlDoc.querySelector('LoginResult, return, ns1\\:LoginResult');
                 if (!resultElement || !resultElement.textContent.trim()) {
-                    console.log('XML Structure:');
-                    const allElems = xmlDoc.getElementsByTagName('*');
-                    for (let elem of allElems) {
-                        console.log(`- ${elem.nodeName}: ${elem.textContent.substring(0, 50)}`);
-                    }
-                    throw new Error('No valid result found in response');
+                    return {
+                        success: false,
+                        type: 'parse_error',
+                        message: 'Invalid response format',
+                        data: xmlText.substring(0, 200)
+                    };
                 }
                 
                 const resultText = resultElement.textContent.trim();
-                console.log('Result text:', resultText);
                 
-                return resultText;
+                try {
+                    const jsonData = JSON.parse(resultText);
+                    return {
+                        success: jsonData.ResultCode === 0,
+                        type: jsonData.ResultCode === 0 ? 'success' : 'auth_error',
+                        message: jsonData.ResultMessage || (jsonData.ResultCode === 0 ? 'Login successful' : 'Wrong username or password'),
+                        data: jsonData
+                    };
+                } catch {
+                    // If not JSON
+                    if (resultText.includes('EntityID') || resultText.includes('ResultCode: 0')) {
+                        return {
+                            success: true,
+                            type: 'success',
+                            message: 'Login successful',
+                            data: resultText
+                        };
+                    } else {
+                        return {
+                            success: false,
+                            type: 'auth_error',
+                            message: 'Wrong username or password',
+                            data: resultText
+                        };
+                    }
+                }
                 
             } catch (error) {
-                console.error('Parse error:', error);
-                throw new Error(`Parse error: ${error.message}`);
+                return {
+                    success: false,
+                    type: 'parse_error',
+                    message: `Parse error: ${error.message}`,
+                    data: xmlText.substring(0, 200)
+                };
             }
+        }
+        
+        // Display result with proper styling
+        function displayResult(result) {
+            // Clear previous classes
+            resultMessage.className = 'result-header';
+            
+            if (result.success) {
+                // SUCCESS
+                resultTitle.innerHTML = '<i class="bi bi-check-circle"></i> Login Successful';
+                resultMessage.classList.add('result-success');
+            } else if (result.type === 'auth_error') {
+                // AUTH ERROR
+                resultTitle.innerHTML = '<i class="bi bi-x-circle"></i> Wrong username or password';
+                resultMessage.classList.add('result-error');
+            } else {
+                // OTHER ERROR
+                resultTitle.innerHTML = '<i class="bi bi-exclamation-triangle"></i> ' + result.message;
+                resultMessage.classList.add('result-warning');
+            }
+            
+            // Display data
+            if (typeof result.data === 'object') {
+                resultContent.textContent = JSON.stringify(result.data, null, 2);
+            } else {
+                resultContent.textContent = result.data;
+            }
+            
+            // Show container
+            resultContainer.style.display = 'block';
+            errorAlert.style.display = 'none';
+            
+            // Smooth scroll
+            setTimeout(() => {
+                resultContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 100);
         }
         
         // Utility functions
@@ -337,41 +422,19 @@
         function showLoading(show) {
             if (show) {
                 spinner.style.display = 'inline-block';
+                btnText.textContent = 'Logging in...';
                 submitBtn.disabled = true;
-                submitBtn.textContent = 'Logging in...';
             } else {
                 spinner.style.display = 'none';
+                btnText.textContent = 'Login via SOAP';
                 submitBtn.disabled = false;
-                submitBtn.textContent = 'Login via SOAP';
             }
         }
         
         function showError(message) {
-            errorAlert.textContent = '❌ ' + message;
+            errorAlert.innerHTML = `<i class="bi bi-exclamation-triangle"></i> ${message}`;
             errorAlert.style.display = 'block';
             resultContainer.style.display = 'none';
-        }
-        
-        function showResult(data) {
-            try {
-                // Try to parse as JSON
-                const json = JSON.parse(data);
-                resultContent.textContent = JSON.stringify(json, null, 2);
-            } catch {
-                // If not JSON, show as plain text
-                resultContent.textContent = data;
-            }
-            if(resultContent["ResultCode"]=-1) 
-            resultContainer.style.display = 'block';
-            errorAlert.style.display = 'none';
-            
-            // Smooth scroll to result
-            setTimeout(() => {
-                resultContainer.scrollIntoView({ 
-                    behavior: 'smooth', 
-                    block: 'nearest' 
-                });
-            }, 100);
         }
         
         function clearMessages() {
@@ -382,17 +445,14 @@
         function copyResult() {
             const text = resultContent.textContent;
             navigator.clipboard.writeText(text).then(() => {
-                const btn = event.target;
-                const originalText = btn.textContent;
-                btn.textContent = '✓ Copied!';
+                const btn = event.target.closest('.copy-btn');
+                const originalHtml = btn.innerHTML;
+                btn.innerHTML = '<i class="bi bi-check"></i> Copied!';
                 setTimeout(() => {
-                    btn.textContent = originalText;
+                    btn.innerHTML = originalHtml;
                 }, 2000);
             });
         }
-        
-        // Quick test
-        
     </script>
 </body>
 </html>
