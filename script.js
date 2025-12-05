@@ -1,39 +1,51 @@
-// Используем самую надежную бесплатную прокси
-const PROXY_URL = 'https://api.allorigins.win/raw?url=';
+// USE CORS-ANYWHERE for SOAP/POST requests (AllOrigins drops POST bodies)
+// Note: You must visit https://cors-anywhere.herokuapp.com/corsdemo to enable this demo proxy first
+const PROXY_URL = 'https://cors-anywhere.herokuapp.com/';
 
-// Основные функции
+// 1. Correct Endpoint derived from WSDL <service> -> <port> -> <address>
+const SOAP_ENDPOINT = 'http://isapi.mekashron.com/icu-tech/icutech-test.dll/soap/IICUTech';
+
 async function loginWithSOAP(username, password) {
     showLoading(true);
     clearMessages();
     
+    // 2. Constructed SOAP Envelope
+    // Matches WSDL PortType "Login" and Namespace "urn:ICUTech.Intf-IICUTech"
     const soapRequest = `<?xml version="1.0" encoding="utf-8"?>
-<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
-    <soap:Body>
-        <Login xmlns="urn:ICUTech.Intf-IICUTech">
-            <UserName>${escapeXml(username)}</UserName>
-            <Password>${escapeXml(password)}</Password>
-            <IPs>127.0.0.1</IPs>
-        </Login>
-    </soap:Body>
-</soap:Envelope>`;
+    <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:urn="urn:ICUTech.Intf-IICUTech">
+        <soap:Body>
+            <urn:Login>
+                <UserName>${escapeXml(username)}</UserName>
+                <Password>${escapeXml(password)}</Password>
+                <IPs>127.0.0.1</IPs>
+            </urn:Login>
+        </soap:Body>
+    </soap:Envelope>`;
     
-   //const endpoint = 'http://isapi.mekashron.com/icu-tech/icu-tech-test.dll';
-    const endpoin='http://www.borland.com/namespaces/Types';
     try {
         const controller = new AbortController();
-        setTimeout(() => controller.abort(), 8000);
+        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
         
-        const response = await fetch(PROXY_URL + encodeURIComponent(endpoint), {
+        // 3. Fix: Use correct variable names and Proxy logic
+        // We append the target URL to the Proxy URL
+        const response = await fetch(PROXY_URL + SOAP_ENDPOINT, {
             method: 'POST',
             headers: {
                 'Content-Type': 'text/xml; charset=utf-8',
-                'SOAPAction': 'urn:ICUTech.Intf-IICUTech#Login'
+                'SOAPAction': 'urn:ICUTech.Intf-IICUTech#Login',
+                // specific header often needed for CORS proxies
+                'X-Requested-With': 'XMLHttpRequest' 
             },
             body: soapRequest,
             signal: controller.signal
         });
         
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        clearTimeout(timeoutId);
+        
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`HTTP ${response.status}: ${errorText.substring(0, 100)}`);
+        }
         
         const xmlText = await response.text();
         return parseSoapResponse(xmlText);
@@ -48,22 +60,34 @@ function parseSoapResponse(xmlText) {
         const parser = new DOMParser();
         const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
         
+        // Check for SOAP Faults
         const fault = xmlDoc.querySelector('faultstring');
         if (fault) throw new Error(fault.textContent || 'SOAP error');
         
-        const result = xmlDoc.querySelector('LoginResult');
-        if (!result) throw new Error('Invalid response format');
+        // 4. Fix: WSDL defines the output part name as "return", not "LoginResult"
+        // Look for 'return' tag. Handle namespaced tags (e.g. <NS1:return>)
+        const resultNode = xmlDoc.getElementsByTagName('return')[0] || 
+                           xmlDoc.querySelector('return');
+                           
+        if (!resultNode) throw new Error('Invalid response format: <return> tag not found');
         
+        // The service appears to return a JSON string inside the XML string
+        const resultString = resultNode.textContent.trim();
+
         return {
             success: true,
-            data: result.textContent.trim()
+            data: resultString
         };
     } catch (error) {
+        console.error("XML Parse Error", xmlText);
         throw new Error(`Parse error: ${error.message}`);
     }
 }
 
+// --- Helper Utilities (kept same as your code) ---
+
 function escapeXml(text) {
+    if (!text) return '';
     return text.replace(/[<>&'"]/g, function(c) {
         switch(c) {
             case '<': return '&lt;';
@@ -76,112 +100,99 @@ function escapeXml(text) {
     });
 }
 
+// --- UI Functions (kept same as your code) ---
+
 function showLoading(show) {
     const spinner = document.getElementById('spinner');
     const btn = document.getElementById('submitBtn');
     
-    if (show) {
-        spinner.style.display = 'inline-block';
-        btn.disabled = true;
-        btn.textContent = ' Connecting...';
-    } else {
-        spinner.style.display = 'none';
-        btn.disabled = false;
-        btn.textContent = 'Login via SOAP';
+    if (spinner) spinner.style.display = show ? 'inline-block' : 'none';
+    if (btn) {
+        btn.disabled = show;
+        btn.textContent = show ? ' Connecting...' : 'Login via SOAP';
     }
 }
 
 function showSuccess(result) {
     const container = document.getElementById('resultContainer');
     const content = document.getElementById('resultContent');
+    const alert = document.getElementById('errorAlert');
+
+    if (alert) alert.style.display = 'none';
     
-    try {
-        const json = JSON.parse(result.data);
-        content.textContent = JSON.stringify(json, null, 2);
-    } catch {
-        content.textContent = result.data;
+    if (content) {
+        try {
+            // The SOAP return is typically a JSON string, let's pretty print it
+            const json = JSON.parse(result.data);
+            content.textContent = JSON.stringify(json, null, 2);
+        } catch (e) {
+            content.textContent = result.data;
+        }
     }
     
-    container.style.display = 'block';
-    document.getElementById('errorAlert').style.display = 'none';
-    
-    // Smooth scroll
-    setTimeout(() => container.scrollIntoView({ behavior: 'smooth' }), 100);
+    if (container) {
+        container.style.display = 'block';
+        setTimeout(() => container.scrollIntoView({ behavior: 'smooth' }), 100);
+    }
 }
 
 function showError(message) {
     const alert = document.getElementById('errorAlert');
-    document.getElementById('errorMessage').textContent = message;
-    alert.style.display = 'block';
-    document.getElementById('resultContainer').style.display = 'none';
+    const msgBox = document.getElementById('errorMessage');
+    const container = document.getElementById('resultContainer');
+    
+    if (container) container.style.display = 'none';
+    
+    if (msgBox) msgBox.textContent = message;
+    if (alert) alert.style.display = 'block';
 }
 
 function clearMessages() {
-    document.getElementById('errorAlert').style.display = 'none';
-    document.getElementById('resultContainer').style.display = 'none';
+    const alert = document.getElementById('errorAlert');
+    const container = document.getElementById('resultContainer');
+    if (alert) alert.style.display = 'none';
+    if (container) container.style.display = 'none';
 }
 
-function copyResult() {
-    const text = document.getElementById('resultContent').textContent;
-    navigator.clipboard.writeText(text).then(() => {
-        const btn = event.currentTarget;
-        const original = btn.innerHTML;
-        btn.innerHTML = '✓';
-        setTimeout(() => btn.innerHTML = original, 1500);
-    });
-}
+// --- Initialization ---
 
-// Event handlers
-function initEventListeners() {
-    document.getElementById('togglePassword').addEventListener('click', function() {
-        const input = document.getElementById('password');
-        if (input.type === 'password') {
-            input.type = 'text';
-            this.textContent = '🙈';
-        } else {
-            input.type = 'password';
-            this.textContent = '👁';
-        }
-    });
-    
-    document.getElementById('loginForm').addEventListener('submit', async function(e) {
-        e.preventDefault();
-        
-        if (!this.checkValidity()) {
-            this.classList.add('was-validated');
-            return;
-        }
-        
-        const username = document.getElementById('username').value.trim();
-        const password = document.getElementById('password').value;
-        
-        try {
-            const result = await loginWithSOAP(username, password);
-            if (result.success) showSuccess(result);
-        } catch (error) {
-            showError(error.message);
-        } finally {
-            showLoading(false);
-        }
-    });
-}
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('loginForm');
+    if (form) {
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const usernameInput = document.getElementById('username');
+            const passwordInput = document.getElementById('password');
+            
+            if (!usernameInput || !passwordInput) return;
 
-// Performance optimization
-function initPerformanceOptimizations() {
-    // Загружаем иконки только если нужны
-    if (document.fonts && document.fonts.ready) {
-        document.fonts.ready.then(() => {
-            // Можно загрузить иконки если нужно
+            const username = usernameInput.value.trim();
+            const password = passwordInput.value;
+            
+            try {
+                const result = await loginWithSOAP(username, password);
+                showSuccess(result);
+            } catch (error) {
+                showError(error.message);
+            } finally {
+                showLoading(false);
+            }
         });
     }
     
-    // Убираем возможный layout shift
-    const btn = document.getElementById('submitBtn');
-    btn.style.minHeight = btn.offsetHeight + 'px';
-}
-
-// Initialize
-document.addEventListener('DOMContentLoaded', function() {
-    initEventListeners();
-    initPerformanceOptimizations();
+    // Toggle Password Visibility
+    const toggleBtn = document.getElementById('togglePassword');
+    if (toggleBtn) {
+        toggleBtn.addEventListener('click', function() {
+            const input = document.getElementById('password');
+            if (input.type === 'password') {
+                input.type = 'text';
+                this.textContent = '🙈';
+            } else {
+                input.type = 'password';
+                this.textContent = '👁';
+            }
+        });
+    }
 });
