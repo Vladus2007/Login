@@ -3,69 +3,163 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Mekashron Login - Secure SOAP authentication">
     <title>Mekashron Login</title>
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+    
+    <!-- Встроенный критический CSS -->
     <style>
+        /* Critical CSS - минимизированная версия Bootstrap и кастомные стили */
+        :root {
+            --primary-color: #4a90e2;
+            --primary-dark: #3a80d2;
+            --gradient-start: #667eea;
+            --gradient-end: #764ba2;
+            --white: #ffffff;
+            --gray-light: #f8f9fa;
+            --success: #28a745;
+            --error: #dc3545;
+            --warning: #ffc107;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 1rem;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', sans-serif;
+            line-height: 1.5;
         }
         
         .login-card {
+            background: var(--white);
             border-radius: 12px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.2);
             overflow: hidden;
             max-width: 450px;
             width: 100%;
+            margin: 0 auto;
         }
         
         .card-header {
-            background-color: #4a90e2;
-            color: white;
+            background-color: var(--primary-color);
+            color: var(--white);
             text-align: center;
             padding: 1.5rem;
+        }
+        
+        .card-header h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 0;
+            color: var(--white) !important;
         }
         
         .card-body {
             padding: 2rem;
         }
         
-        .form-control:focus {
-            border-color: #4a90e2;
-            box-shadow: 0 0 0 0.25rem rgba(74, 144, 226, 0.25);
+        .form-group {
+            margin-bottom: 1rem;
         }
         
-        .btn-login {
-            background-color: #4a90e2;
-            border-color: #4a90e2;
-            padding: 0.75rem;
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
             font-weight: 500;
+            color: #333;
+        }
+        
+        .input-group {
+            display: flex;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .input-group-text {
+            padding: 0.5rem 0.75rem;
+            background-color: #e9ecef;
+            border: none;
+            color: #495057;
+            font-size: 1rem;
+        }
+        
+        .form-control {
+            flex: 1;
+            padding: 0.5rem 0.75rem;
+            border: none;
+            outline: none;
+            font-size: 1rem;
             width: 100%;
         }
         
+        .form-control:focus {
+            outline: 2px solid var(--primary-color);
+            outline-offset: -1px;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-weight: 500;
+            text-align: center;
+            cursor: pointer;
+            transition: background-color 0.15s ease-in-out;
+            width: 100%;
+        }
+        
+        .btn-login {
+            background-color: var(--primary-color);
+            color: var(--white);
+        }
+        
         .btn-login:hover {
-            background-color: #3a80d2;
-            border-color: #3a80d2;
+            background-color: var(--primary-dark);
         }
         
         .btn-login:disabled {
-            background-color: #6ca5e8;
-            border-color: #6ca5e8;
+            opacity: 0.65;
+            cursor: not-allowed;
         }
         
-        .spinner-border {
+        .spinner {
+            display: inline-block;
             width: 1rem;
             height: 1rem;
-            border-width: 0.15em;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--white);
+            animation: spin 1s linear infinite;
             margin-right: 0.5rem;
             vertical-align: middle;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .alert {
+            padding: 1rem;
+            border-radius: 4px;
+            margin-top: 1rem;
+            display: none;
+        }
+        
+        .alert-danger {
+            background-color: rgba(220, 53, 69, 0.1);
+            border: 1px solid var(--error);
+            color: #721c24;
         }
         
         .result-container {
@@ -80,29 +174,31 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            color: white;
+            color: var(--white);
         }
         
         .result-success {
-            background-color: #28a745;
+            background-color: var(--success);
         }
         
         .result-error {
-            background-color: #dc3545;
+            background-color: var(--error);
         }
         
         .result-warning {
-            background-color: #ffc107;
+            background-color: var(--warning);
             color: #212529;
         }
         
         .result-content {
             padding: 1rem;
-            background-color: #f8f9fa;
+            background-color: var(--gray-light);
             max-height: 300px;
             overflow-y: auto;
             font-size: 0.875rem;
             margin: 0;
+            white-space: pre-wrap;
+            word-break: break-all;
         }
         
         .copy-btn {
@@ -112,62 +208,174 @@
             border-radius: 4px;
             padding: 0.25rem 0.5rem;
             font-size: 0.875rem;
+            cursor: pointer;
         }
         
         .copy-btn:hover {
             background: rgba(255, 255, 255, 0.3);
         }
+        
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+        
+        /* Accessibility improvements */
+        .form-control:focus,
+        .copy-btn:focus,
+        .btn:focus {
+            outline: 2px solid var(--primary-color);
+            outline-offset: 2px;
+        }
+        
+        /* High contrast for header */
+        .card-header h1 {
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        }
+        
+        /* Responsive */
+        @media (max-width: 576px) {
+            .card-body {
+                padding: 1.5rem;
+            }
+            
+            .card-header {
+                padding: 1rem;
+            }
+            
+            body {
+                padding: 0.5rem;
+            }
+        }
+        
+        /* Lazy loaded fonts */
+        .bi {
+            display: inline-block;
+            font-style: normal;
+            font-weight: normal;
+            line-height: 1;
+            font-size: 1rem;
+        }
+        
+        /* Минимальная загрузка иконок */
+        .bi::before {
+            content: attr(data-icon);
+        }
     </style>
+    
+    <!-- Preload critical resources -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link rel="preload" as="style" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" 
+          onload="this.onload=null;this.rel='stylesheet'">
+    <noscript>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
+    </noscript>
+    
+    <!-- Bootstrap Icons - загружаем только woff2 формат с font-display: swap -->
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/fonts/bootstrap-icons.woff2" 
+          as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css" 
+          media="print" onload="this.media='all'">
 </head>
 <body>
-    <div class="login-card card">
-        <div class="card-header">
-            <h3 class="mb-0"><i class="bi bi-shield-lock"></i> Mekashron Login</h3>
-            
-        </div>
+    <a href="#main-content" class="sr-only">Skip to main content</a>
+    
+    <div class="login-card">
+        <header class="card-header" role="banner">
+            <h1><span data-icon="🔒" class="bi"></span> Mekashron Login</h1>
+        </header>
         
-        <div class="card-body">
-            <form id="loginForm">
-                <div class="mb-3">
-                    <label for="username" class="form-label">Username</label>
+        <main id="main-content" class="card-body" role="main">
+            <form id="loginForm" aria-label="Login form">
+                <div class="form-group">
+                    <label for="username">Username</label>
                     <div class="input-group">
-                        <span class="input-group-text"><i class="bi bi-person"></i></span>
-                        <input type="text" class="form-control" id="username" placeholder="Enter username" required>
+                        <span class="input-group-text"><span data-icon="👤" class="bi"></span></span>
+                        <input type="text" class="form-control" id="username" 
+                               placeholder="Enter username" required 
+                               aria-required="true" autocomplete="username">
                     </div>
                 </div>
                 
-                <div class="mb-4">
-                    <label for="password" class="form-label">Password</label>
+                <div class="form-group">
+                    <label for="password">Password</label>
                     <div class="input-group">
-                        <span class="input-group-text"><i class="bi bi-key"></i></span>
-                        <input type="password" class="form-control" id="password" placeholder="Enter password" required>
+                        <span class="input-group-text"><span data-icon="🔑" class="bi"></span></span>
+                        <input type="password" class="form-control" id="password" 
+                               placeholder="Enter password" required
+                               aria-required="true" autocomplete="current-password">
                     </div>
                 </div>
                 
-                <button type="submit" id="submitBtn" class="btn btn-login btn-lg">
-                    <span id="spinner" class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display: none;"></span>
+                <button type="submit" id="submitBtn" class="btn btn-login" 
+                        aria-label="Login via SOAP protocol">
+                    <span id="spinner" class="spinner" role="status" aria-hidden="true" 
+                          style="display: none;"></span>
                     <span id="btnText">Login via SOAP</span>
                 </button>
             </form>
             
-            <div id="errorAlert" class="alert alert-danger mt-3" role="alert" style="display: none;"></div>
+            <div id="errorAlert" class="alert alert-danger" role="alert" 
+                 aria-live="polite" aria-atomic="true" style="display: none;"></div>
             
-            <div id="resultContainer" class="result-container">
+            <section id="resultContainer" class="result-container" aria-live="polite">
                 <div id="resultMessage" class="result-header">
                     <span id="resultTitle"></span>
-                    <button class="copy-btn" onclick="copyResult()">
-                        <i class="bi bi-clipboard"></i> Copy
+                    <button class="copy-btn" onclick="copyResult()" aria-label="Copy result to clipboard">
+                        <span data-icon="📋" class="bi"></span> Copy
                     </button>
                 </div>
                 <pre id="resultContent" class="result-content"></pre>
-            </div>
-            
-           
-        </div>
+            </section>
+        </main>
     </div>
 
-    <!-- Bootstrap 5 JS Bundle with Popper -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Bootstrap JS - загружаем асинхронно -->
+    <script>
+        // Функция для динамической загрузки скриптов
+        function loadScript(src, onload) {
+            var script = document.createElement('script');
+            script.src = src;
+            script.async = true;
+            script.defer = true;
+            if (onload) script.onload = onload;
+            document.head.appendChild(script);
+        }
+        
+        // Загружаем Bootstrap JS после загрузки страницы
+        if (window.requestIdleCallback) {
+            requestIdleCallback(function() {
+                loadScript('https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js');
+            });
+        } else {
+            setTimeout(function() {
+                loadScript('https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js');
+            }, 1000);
+        }
+        
+        // Инициализация иконок с font-display: swap fallback
+        document.addEventListener('DOMContentLoaded', function() {
+            // Проверяем загрузились ли иконки, если нет - показываем эмодзи
+            setTimeout(function() {
+                var icons = document.querySelectorAll('.bi');
+                icons.forEach(function(icon) {
+                    var style = window.getComputedStyle(icon, ':before');
+                    if (!style.content || style.content === 'none') {
+                        // Fallback на эмодзи
+                        var emoji = icon.getAttribute('data-icon');
+                        icon.innerHTML = emoji;
+                    }
+                });
+            }, 100);
+        });
+    </script>
 
     <script>
         // ✅ CONFIGURATION - WORKING ENDPOINT
@@ -188,18 +396,13 @@
         
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('✅ Mekashron Login initialized with Bootstrap');
+            console.log('✅ Mekashron Login initialized with optimized loading');
             
             // Form submission
             loginForm.addEventListener('submit', async function(e) {
                 e.preventDefault();
                 await handleLogin();
             });
-            
-            // Test with sample credentials (optional - remove in production)
-            // Uncomment for testing:
-            // document.getElementById('username').value = 'test@example.com';
-            // document.getElementById('password').value = 'password123';
         });
         
         // Main login handler
@@ -216,13 +419,9 @@
             clearMessages();
             
             try {
-                // 1. Create SOAP request
                 const soapRequest = createSoapRequest(username, password);
-                
-                // 2. Prepare proxy URL
                 const proxyUrl = PROXY + encodeURIComponent(ENDPOINT);
                 
-                // 3. Send request
                 const response = await fetchWithTimeout(proxyUrl, {
                     method: 'POST',
                     headers: {
@@ -239,10 +438,7 @@
                     throw new Error(`Server error: ${response.status} ${response.statusText}`);
                 }
                 
-                // 4. Get response
                 const xmlText = await response.text();
-                
-                // 5. Parse and display result
                 const result = parseSoapResponse(xmlText);
                 displayResult(result);
                 
@@ -276,7 +472,6 @@
                 const parser = new DOMParser();
                 const xmlDoc = parser.parseFromString(xmlText, "text/xml");
                 
-                // Check for SOAP fault
                 const fault = xmlDoc.querySelector('faultstring');
                 if (fault && fault.textContent) {
                     const faultText = fault.textContent.trim();
@@ -298,7 +493,6 @@
                     };
                 }
                 
-                // Find result element
                 const resultElement = xmlDoc.querySelector('LoginResult, return, ns1\\:LoginResult');
                 if (!resultElement || !resultElement.textContent.trim()) {
                     return {
@@ -320,7 +514,6 @@
                         data: jsonData
                     };
                 } catch {
-                    // If not JSON
                     if (resultText.includes('EntityID') || resultText.includes('ResultCode: 0')) {
                         return {
                             success: true,
@@ -350,35 +543,28 @@
         
         // Display result with proper styling
         function displayResult(result) {
-            // Clear previous classes
             resultMessage.className = 'result-header';
             
             if (result.success) {
-                // SUCCESS
-                resultTitle.innerHTML = '<i class="bi bi-check-circle"></i> Login Successful';
+                resultTitle.innerHTML = '<span data-icon="✅" class="bi"></span> Login Successful';
                 resultMessage.classList.add('result-success');
             } else if (result.type === 'auth_error') {
-                // AUTH ERROR
-                resultTitle.innerHTML = '<i class="bi bi-x-circle"></i> Wrong username or password';
+                resultTitle.innerHTML = '<span data-icon="❌" class="bi"></span> Wrong username or password';
                 resultMessage.classList.add('result-error');
             } else {
-                // OTHER ERROR
-                resultTitle.innerHTML = '<i class="bi bi-exclamation-triangle"></i> ' + result.message;
+                resultTitle.innerHTML = '<span data-icon="⚠️" class="bi"></span> ' + result.message;
                 resultMessage.classList.add('result-warning');
             }
             
-            // Display data
             if (typeof result.data === 'object') {
                 resultContent.textContent = JSON.stringify(result.data, null, 2);
             } else {
                 resultContent.textContent = result.data;
             }
             
-            // Show container
             resultContainer.style.display = 'block';
             errorAlert.style.display = 'none';
             
-            // Smooth scroll
             setTimeout(() => {
                 resultContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             }, 100);
@@ -424,15 +610,17 @@
                 spinner.style.display = 'inline-block';
                 btnText.textContent = 'Logging in...';
                 submitBtn.disabled = true;
+                submitBtn.setAttribute('aria-busy', 'true');
             } else {
                 spinner.style.display = 'none';
                 btnText.textContent = 'Login via SOAP';
                 submitBtn.disabled = false;
+                submitBtn.setAttribute('aria-busy', 'false');
             }
         }
         
         function showError(message) {
-            errorAlert.innerHTML = `<i class="bi bi-exclamation-triangle"></i> ${message}`;
+            errorAlert.innerHTML = '<span data-icon="⚠️" class="bi"></span> ' + message;
             errorAlert.style.display = 'block';
             resultContainer.style.display = 'none';
         }
@@ -447,7 +635,7 @@
             navigator.clipboard.writeText(text).then(() => {
                 const btn = event.target.closest('.copy-btn');
                 const originalHtml = btn.innerHTML;
-                btn.innerHTML = '<i class="bi bi-check"></i> Copied!';
+                btn.innerHTML = '<span data-icon="✅" class="bi"></span> Copied!';
                 setTimeout(() => {
                     btn.innerHTML = originalHtml;
                 }, 2000);
