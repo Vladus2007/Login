@@ -383,7 +383,7 @@
                         success: jsonData.ResultCode != -1,
                         type: jsonData.ResultCode === -1 ? 'auth_error' : 'success',
                         message: jsonData.ResultMessage || (jsonData.ResultCode === -1 ? 'Wrong username or password':'Login successful'),
-                        data: ""
+                        data: 'Success!'
                     };
                 } catch {
                     if (resultText.includes('EntityId') || resultText.includes('ResultCode: 0')) {
@@ -395,7 +395,7 @@
                         };
                     } else {
                         
-                                                return {
+                        return {
                             success: true,
                             type: 'success',
                             message: 'Login successful',
