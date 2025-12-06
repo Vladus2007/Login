@@ -252,9 +252,7 @@
             <div id="resultContainer" class="result-container">
                 <div id="resultMessage" class="result-header">
                     <span id="resultTitle"></span>
-                    <button class="copy-btn" onclick="copyResult()">
-                        📋 Copy
-                    </button>
+                    
                 </div>
                 <pre id="resultContent" class="result-content"></pre>
             </div>
@@ -382,25 +380,26 @@
                 try {
                     const jsonData = JSON.parse(resultText);
                     return {
-                        success: jsonData.ResultCode === 0,
-                        type: jsonData.ResultCode === 0 ? 'success' : 'auth_error',
-                        message: jsonData.ResultMessage || (jsonData.ResultCode === 0 ? 'Login successful' : 'Wrong username or password'),
-                        data: jsonData
+                        success: jsonData.ResultCode != -1,
+                        type: jsonData.ResultCode === -1 ? 'auth_error' : 'success',
+                        message: jsonData.ResultMessage || (jsonData.ResultCode === -1 ? 'Wrong username or password':'Login successful'),
+                        data: ""
                     };
                 } catch {
                     if (resultText.includes('EntityId') || resultText.includes('ResultCode: 0')) {
-                        return {
-                            success: true,
-                            type: 'success',
-                            message: 'Login successful',
-                            data: ""
-                        };
-                    } else {
-                        return {
+                            return {
                             success: false,
                             type: 'auth_error',
                             message: 'Wrong username or password',
                             data: resultText
+                        };
+                    } else {
+                        
+                                                return {
+                            success: true,
+                            type: 'success',
+                            message: 'Login successful',
+                            data: ""
                         };
                     }
                 }
